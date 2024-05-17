@@ -4,22 +4,35 @@
 ###### generate_data.R, three_groups_nimble.R, pickrell_data.rds, 
 ######     competitors_methods.R, evaluation_metrics.R
 #############################
-# save arguments from bash 
-bash_args = commandArgs(trailingOnly = T)
-# test if there is at least one argument: if not, return an error
-if (length(bash_args)==0) {
-  stop("At least one argument must be supplied (input file).n", call.=FALSE)
-} else if (length(bash_args)==1) {
-  # default output file
-  bash_args[2] = "out.txt"
-}
-#############################
-if(!exists("bash_args")){           # for debugging
-  bash_args <- c(127, ".....TEMP....")
-}
-#############################
+# # save arguments from bash 
+# bash_args = commandArgs(trailingOnly = T)
+# # test if there is at least one argument: if not, return an error
+# if (length(bash_args)==0) {
+#   stop("At least one argument must be supplied (input file).n", call.=FALSE)
+# } else if (length(bash_args)==1) {
+#   # default output file
+#   bash_args[2] = "out.txt"
+# }
+# #############################
+# if(!exists("bash_args")){           # for debugging
+#   bash_args <- c(127, ".....TEMP....")
+# }
+# #############################
+# my_seed1 <- as.numeric(bash_args[1])/127
+
+
+library(edgeR)
+library(seqgendiff)
+library(nimble)
+library(tictoc)
+library(limma)
+library(qvalue)
+library(MASS)
+library(dplyr)
+library(DESeq2)
 tic()
-my_seed1 <- as.numeric(bash_args[1])/127
+
+my_seed1 <- 1
 set.seed(my_seed1*127)
 
 # !!! SAVE NAMES !!! 
