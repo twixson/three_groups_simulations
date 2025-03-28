@@ -23,3 +23,5 @@ Below I will show you how to run a single simulation. Feel free to contact me if
    - Compute evaluation metrics (like the logarithmic score, etc.) for all runs using `evaluation_metrics.R`.
    - Save evaluation metrics in a table and posterior probabilities of group membership in `.rds` files.
 
+## Faster Script!!!
+We have found a way to improve the computation time by taking advantage of the sparsity inherent in the multiplication that is performed. This is included in the script `tg_new.R`. To use this script instead of the old (slow) `TG_nimble_model.R` you will need to change `parent_script.R` so that it runs `tg_new.R`. 
