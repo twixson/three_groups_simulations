@@ -1,6 +1,8 @@
 # three_groups_simulations
 Houses the simulation scripts for the three groups GWAS and RNA-seq model (publication forthcoming). 
 
+The code for the real data analysis is the same as in the TG_nimble_model.R except for two noticable changes. First, the real data includes addition of other covariates. Second, the script used for the real data anlysis does not loop over different models, each model was run on its own script. Due to data privacy concerns we cannot share the data and thus sharing the script for that analysis is not useful. 
+
 
 ### **WARNING**: these simulations take a long time to run. It takes X hours to run on my laptop with the `parent_script.R` options as they are.
 
