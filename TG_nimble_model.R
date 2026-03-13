@@ -14,7 +14,12 @@ dhalfpiMOM <- nimbleFunction(
   run = function(x=double(0), t=double(0), r=double(0), 
                  log=integer(0, default=0)){
     returnType(double(0))
-    logProb <- (r/2)*log(t)-log(gamma(r/2))-(r+1)*log(x)-t/(x^2)
+    if(x == 0){
+      logProb = 0
+    } else {
+      logProb <- (r/2)*log(2*t)-log(gamma(r/2))-(r+1)*log(x)-t/(x^2)
+    }
+    
     if(log) return(logProb)
     else return(exp(logProb))
   })
@@ -50,7 +55,6 @@ dBernoulliVector <- nimbleFunction(
                  prob = double(1),
                  log  = integer(0, default = 0)) { ## default should be zero
     
-    
     returnType(double(0))
     logProb <- sum(dbinom(x, size = 1, prob = prob, log = TRUE))
     if(log) return(logProb) else return(exp(logProb))
@@ -64,7 +68,6 @@ dNegBinVector <- nimbleFunction(
                  size = double(0),
                  prob = double(1),
                  log  = integer(0, default = 0)) { ## default should be zero
-    
     
     returnType(double(0))
     logProb <- sum(dnbinom(x, size = size, prob = prob, log = TRUE))
@@ -101,13 +104,22 @@ dBernoulliVector <- nimbleFunction(
                  prob = double(1),
                  log  = integer(0, default = 0)) { ## default should be zero
     
-    
     returnType(double(0))
     logProb <- sum(dbinom(x, size = 1, prob = prob, log = TRUE))
     if(log) return(logProb) else return(exp(logProb))
   }
 )
 
+# for sparse matrix multiplication
+sparseMult <- nimbleFunction(
+  run = function(nonzeros_ind = double(1),
+                 dataMat = double(2), 
+                 effSizes = double(1)){
+    returnType(double(1))
+    nonzeros <- which(nonzeros_ind == 1)
+    out <- dataMat[ , nonzeros] %*% effSizes[nonzeros]
+    return(out[,1])
+  })
 
 ###################
 # RJ sampler with multiple toggles
@@ -160,8 +172,8 @@ my_sampler_RJ_indicator <- nimbleFunction(
         logProbReverseProposal <- logProbReverseProposal + 
           dnorm(currentCoef[l], proposalMean, proposalScale, log = TRUE)
       }
-      values(model, coefNode) <<- rep(0.5, len_coefNode) 
-      # make the excluded delta's (eff-sizes) 0.5 so the t-param can be sampled
+      values(model, coefNode) <<- rep(0, len_coefNode) 
+      # these zeros are handled in the "if(x == 0)" part of dhalfpiMOM()
       
       model[[target]] <<- 0
       model$calculate(calcNodes)
@@ -211,10 +223,11 @@ three_groups_code <- nimbleCode({
     # GWAS - patient level  
     Y_GWAS[1:num_individuals_GWAS] ~ 
       dBernoulliVector(p_bern[1:num_individuals_GWAS])
-    p_bern[1:num_individuals_GWAS] <- 
+    p_bern[1:num_individuals_GWAS] <-
       expit(intercept_GWAS +
-              (X_GWAS[1:num_individuals_GWAS, 1:num_genes] %*% 
-                 beta_GWAS[1:num_genes])[,1])
+              sparseMult(nonzeros_ind = not_null[1:num_genes],
+                         dataMat = X_GWAS[1:num_individuals_GWAS,1:num_genes],
+                         effSizes = beta_GWAS[1:num_genes]))
   }
   
   # both RNA-seq and GWAS - iterates through genes
@@ -306,8 +319,8 @@ monitors_RNA  <- c("not_null", "not_ben", "log_fc", "sex_effect", "dispersion",
 monitors_both <- union(monitors_GWAS, monitors_RNA)
   
 # intitialize lists
-models_list   <- list()
-mcmc_list     <- list()
+models_list          <- list()
+mcmc_list            <- list()
 compiled_models_list <- list()
 compiled_mcmc_list   <- list()
 mcmc_samples_list    <- list()

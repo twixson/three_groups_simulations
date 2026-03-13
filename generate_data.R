@@ -80,4 +80,4 @@ generate_RNA_pickrell <- function(data = pickrell_data,
 }
 generate_RNA_pickrell()
 
-
+rm(pickrell_data)

@@ -30,7 +30,7 @@ library(qvalue)
 library(MASS)
 library(dplyr)
 library(DESeq2)
-tic()
+tic("One simulation at preset values")
 
 my_seed1 <- 1
 set.seed(my_seed1*127)
@@ -43,12 +43,12 @@ save_name <- paste0("simulation_", my_seed1, "_", Sys.Date())
 # data shape
 num_individuals_RNA  <- 100
 num_individuals_GWAS <- 1000
-num_genes        <- 250
-num_beneficial   <- 10 
-GWAS_effect      <- c(rep(0.5, 7), rep(0.1, 3), 
-                      rep(0.5, 7), rep(0.1, 3), rep(0, 230))
-RNA_effect       <- c(rep(1.05, 3), rep(1.4, 7), 
-                      rep(1.05, 3), rep(1.4, 7), rep(0, 230))
+num_genes            <- 250
+num_beneficial       <- 10 
+GWAS_effect          <- c(rep(0.5, 2*num_beneficial), 
+                          rep(0, num_genes - 2*num_beneficial))
+RNA_effect           <- c(rep(1.4, 2*num_beneficial), 
+                          rep(0, num_genes - 2*num_beneficial))
 
 # data generation:
 source("generate_data.R") 
@@ -56,9 +56,16 @@ source("generate_data.R")
   #   Pickrell et. al. (2010) and Montgomery et. al. (2010) and can be accessed
   #   here:   https://bowtie-bio.sourceforge.net/recount/
 
+# # To induce missingness uncomment the following code: 
+# Y_RNA[seq(2,9902, length.out = 100)] <- NA
+# Y_RNA[seq(9,9909, length.out = 100)] <- NA
+# Y_RNA[seq(19,9919, length.out = 100)] <- NA
+# Y_RNA[seq(29,9929, length.out = 100)] <- NA
+# Y_RNA[seq(39,9939, length.out = 100)] <- NA
+
 #############################
 # Three_groups
-models_for_mcmc  <- c("combined", "RNA_only", "GWAS_only")
+models_for_mcmc <- c("combined", "RNA_only", "GWAS_only")
 priors_for_mcmc <- c("piMOM", "local")
 niter           <- 12500
 nburnin         <- 2500
@@ -73,6 +80,7 @@ source("TG_nimble_model.R")
 #############################
 # competitors
 source("competitors_methods.R")
+print("competitors_methods.R completed")
 
 #############################
 # Evaluate
