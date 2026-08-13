@@ -1,5 +1,5 @@
 # Three-groups Simulations
-This repository houses simulation scripts for the three groups GWAS and RNA-seq model (publication forthcoming). 
+This repository houses simulation scripts for the three groups GWAS and RNA-seq model (Wixson et al. 2026). 
 
 The code for the real data analysis is the same as in the TG_nimble_model.R except for two noticable changes. First, the real data includes addition of other covariates. Second, the script used for the real data anlysis does not loop over different models, each model was run on its own script. Due to data privacy concerns we cannot share the data and thus sharing the script for that analysis is not useful. 
 
@@ -34,3 +34,7 @@ Below I will show you how to run a single simulation. Feel free to contact me if
 
 ## Simualation with missingness
 The real data has 34 genes that are only measured in the GWAS experiment. To run simulations under this setting we simply delete the RNA-seq information (replace with `NA`'s) for a handful of genes. There is code in `parent_script.R` to do this that is commented out.
+
+
+
+Citation: Troy P Wixson, Benjamin A Shaby, Daisy L Philtron, Leandro A Lima, Stacia K Wyman, Julia A Kaye, Steven Finkbeiner, International Parkinson Disease Genomics Consortium (IPDGC), A three-groups non-local model for combining heterogeneous data sources to identify genes associated with Parkinson’s disease, Biometrics, Volume 82, Issue 2, June 2026, ujag090, https://doi.org/10.1093/biomtc/ujag090
